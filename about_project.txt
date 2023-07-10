@@ -1,0 +1,21 @@
+This file contains details about the project.
+Each app has a similar file as needed.
+It is a txt file so that we can read and edit it in VS Code.
+
+Passwords:-
+SuperUser: User: John; Email: normal email; Password: JohnSuper
+testuser1, thisisforthefirst
+testuser2, thisisforthesecond
+
+
+Current status
+**************
+Custom user model and superuser created as per Ch 8 Django for Beginners
+...and used in Activity model
+Templates folder set up
+User authentication set up as per Ch 9
+Added Bootstrap, restyled buttons, etc. and added django-crispy-forms and crispy-bootstrap5 (Ch 10)
+Added Password change and reset - Ch 11
+Email (ch 12) skipped - set it up as needed
+
+Created jobs app and set up models for it

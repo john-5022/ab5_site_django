@@ -1,0 +1,28 @@
+Client_id,Job,Task,Action
+1,Pays 22 Feb 2022 - ABC Furniture,Process pays,Check loan account
+,,,Process pays Xero
+,,,Pay pays
+,,,File pays
+,,,download aba file
+,,Check bills,Check bills ab5
+,,,Check bills J&J
+2,Pays 22 Feb 2022 - Banrock Station,Process pays,Receive email
+,,,Enter leave
+,,,Process pays in Xero
+,,,Pay pays
+,,,Handle EOM as needed
+,,,Send emails
+3,EOQ Dec 2021 - Basket Case,Reconcile pays,Reports to PDF
+,,,GL report and reconcile
+,,Prepare BAS,Recon Report 
+,,,Activity Statement
+,,,Request OK to lodge
+,,,Lodge
+4,EOM Jan 2022 - Dimples Warehouise,Check pays,Pay report to PDF
+,,,Check wages payable
+,,Prepare IAS,Prepare & publish in Xero
+,,,Import to XPM
+,,,Print to file
+,,,Request OK to lodge
+,,,Lodge AS
+,,,email re AS lodged

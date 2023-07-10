@@ -1,0 +1,2 @@
+This application handles user accounts.
+It is based on CustomUser model to provide additional flexibility.

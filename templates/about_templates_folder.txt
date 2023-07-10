@@ -1,0 +1,4 @@
+# templates/about_templates_folder.txt
+All templates are stored in this folder to make navigation easier than using the standard Django structure.
+settings.py has been modified so that Django knows to look for templates in this folder.
+To make templates easy to find, include the app name at the start of the template name.

@@ -1,0 +1,10 @@
+<!-- templates/job_list.html -->
+{% extends "base_generic.html" %}
+
+{% block title%} Jobs List {% endblock %}
+
+{% block section%} <h1> Jobs heading </h1> {% endblock%}
+
+{% for row in qs %}
+<a row: {{ row }} </a>
+    {% endfor %}
