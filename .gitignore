@@ -6,7 +6,7 @@
 *.log
 *.pot
 *.pyc
-__pycache__
+__pycache__/
 *.sqlite3
 media
 
@@ -46,3 +46,6 @@ env.bak/
 !.vscode/launch.json 
 !.vscode/extensions.json 
 .history
+
+.idea
+.DS_Store

@@ -1,0 +1,43 @@
+{% extends "base.html"%}
+{% load static %}
+
+{% block content %}
+    {% if tasks %}
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr style="text-align: center">
+                    <th>Client</th>
+                    <th>Job name</th>
+                    <th>Task</th>
+                    <th>Task Description</th>
+                    <th>Review Date</th>
+                    <th>State</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                    <tr class="task-table-row" onclick="window.location='{% url 'edit-task' task.id %}?previous_url={{ request.path }}'">
+                        <td>{{ task.job.client.client_name }}</td>
+                        <td>Pays {{ task.job.period_end }} - {{ task.job.job_name }}</td>
+                        <td>{{ task.task_name }}</td>
+                        <td>{{ task.task_description }}</td>
+                        <td>{{ task.review_date }}</td>
+                        <td>{{ task.get_state_display }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h5>No results found</h5>
+    {% endif %}
+    <div class="row">
+        <div class="col">
+            <script>function goBack(){window.location.href='{% url "dashboard" %}?load=true'}</script>
+            <button class="btn btn-primary" onclick="goBack()">Go Back</button>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block extra_body %}
+    <script src="{% static 'js/tree.js' %}"></script>
+{% endblock extra_body %}

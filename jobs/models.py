@@ -18,7 +18,7 @@ class Action(models.Model):
     date_done = models.DateField(
         blank=True, null=True, help_text="Set by system when user marks as done"
     )
-    task = models.ForeignKey("Task", on_delete=models.CASCADE)
+    task = models.ForeignKey("Task", related_name='actions', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.action_name
@@ -27,9 +27,9 @@ class Action(models.Model):
 # Create activity table - activity_comment is for users
 class Activity(models.Model):
     activity_comment = models.CharField(max_length=200, blank=True)  # For users
-    activity_date = models.DateField(blank=False)
+    activity_date = models.DateField(auto_now_add=True)
     hours = models.DecimalField(max_digits=5, decimal_places=2, blank=False)
-    task = models.ForeignKey("Task", on_delete=models.CASCADE)
+    task = models.ForeignKey("Task", related_name='activities', on_delete=models.CASCADE)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
@@ -78,7 +78,7 @@ class Client(models.Model):
 
 # Create the job table
 class Job(models.Model):
-    client = models.ForeignKey("Client", on_delete=models.CASCADE)
+    client = models.ForeignKey("Client", related_name='jobs', on_delete=models.CASCADE)
     folder_url = models.CharField(max_length=100, blank=True)
     job_name = models.CharField(max_length=100, blank=False)
     period_end = models.DateField(blank=True)
@@ -159,9 +159,6 @@ class Settings(models.Model):
     end_fin_year = models.DateField(blank=False)
 
 
-# # Create the state table Added 'logical' fields for is_completed, not_completed and filter_default
-# #...These are used when displaying filters and only one of each should be 1 / True
-# #...changed _comment to _description
 # class State(models.Model):
 #     filter_default = models.IntegerField(default=0)
 #     is_completed = models.IntegerField(default=0)
@@ -176,22 +173,32 @@ class Settings(models.Model):
 # ...The first part is not used, 2nd is stored in db,
 # ...3rd is displayed - set field length to fit this text.
 class Task(models.Model):
-    class States(models.TextChoices):
-        AN = "ACT", "Action needed"
-        AWOK = "AWOK", "Await OK to lodge..."
-        AWIN = "AWIN", "Await information"
-        COMP = "COMP", "Completed"
-        FUP = "FUP", "Follow up"
-        INP = "INP", "In progress"
-        LOD = "LOD", "Lodged - ATO to file"
-        TOI = "TOI", "To invoice"
+    ACT = 1
+    AWOK = 2
+    AWIN = 3
+    COMP = 4
+    FUP = 5
+    INP = 6
+    LOD = 7
+    TOI = 8
+
+    STATE_CHOICES = {
+        'Action needed': ACT,
+        'Await OK to lodge...': AWOK,
+        'Await information': AWIN,
+        'Completed': COMP,
+        'Follow up': FUP,
+        'In progress': INP,
+        'Lodged - ATO to file': LOD,
+        'To invoice something': TOI,
+    }
 
     deadline_date = models.DateField(blank=True, null=False, help_text="Set as needed")
-    job = models.ForeignKey("Job", on_delete=models.CASCADE)
+    job = models.ForeignKey("Job", related_name='tasks', on_delete=models.CASCADE)
     review_date = models.DateField(blank=True, null=True, help_text="Set as needed")
-    state = models.CharField(
-        max_length=40, choices=States.choices, blank=True
-    )  # Uses the subclass
+    state = models.PositiveSmallIntegerField(
+        choices=[(value, key) for key, value in STATE_CHOICES.items()], null=True, blank=True
+    )
     task_description = models.CharField(max_length=100, blank=True, default=None)
     task_name = models.CharField(max_length=80, blank=False)
     task_order = models.IntegerField(blank=True, default=0)

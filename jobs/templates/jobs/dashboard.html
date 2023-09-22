@@ -1,0 +1,146 @@
+{% extends "base.html"%}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+{% endblock %}
+
+{% block content %}
+    <h1>Dashboard</h1>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Filter</h5>
+                    <form id="task-filters-form" method="post" action="{% url 'list-tree' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="searchInput" class="form-label">Client Name Contains...</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control filter-input" value="{{ client_name }}" name="client_name" id="client-name">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="searchInput" class="form-label">Task Name Contains...</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control filter-input" value="{{ task_name }}" name="task_name" id="task-name">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category">Deadline Dates:</label>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="mb-3">
+                                        <label for="startDate">Start Date:</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control date-selector" value="{{ start_date_deadline }}" name="start_date_deadline" id="start-date-deadline" placeholder="dd/mm/yyyy">
+                                            <button class="btn input-icon-btn" type="button">
+                                                <i class="bi bi-calendar"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3">
+                                        <label for="endDate">End Date:</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control date-selector" value="{{ end_date_deadline }}" name="end_date_deadline" id="end-date-deadline" placeholder="dd/mm/yyyy">
+                                            <button class="btn input-icon-btn" type="button">
+                                                <i class="bi bi-calendar"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="alert alert-danger" id="deadline-date-error"></div>
+                            <button class="btn btn-primary" id="clear-dates-deadline">Clear Dates</button>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category">Review Dates:</label>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="mb-3">
+                                        <label for="startDate">Start Date:</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control date-selector" value="{{ start_date_review }}" name="start_date_review" id="start-date-review" placeholder="dd/mm/yyyy">
+                                            <button class="btn input-icon-btn" type="button">
+                                                <i class="bi bi-calendar"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3">
+                                        <label for="endDate">End Date:</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control date-selector" value="{{ end_date_review }}" name="end_date_review" id="end-date-review" placeholder="dd/mm/yyyy">
+                                            <button class="btn input-icon-btn" type="button">
+                                                <i class="bi bi-calendar"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="alert alert-danger" id="review-date-error"></div>
+                            <button class="btn btn-primary" id="clear-dates-review">Clear Dates</button>
+                        </div>
+                        <div class="mb-3">
+                            <label for="task-state">Task State:</label>
+                            <select class="form-select" name="task_state" id="task-state">
+                                <option value="" selected></option>
+                                <option value="not_completed">Not Completed</option>
+                                {% for key, value in task_states.items %}
+                                    <option value="{{ value }}" {% if value == task_state %}selected{% endif %}>{{ key }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-check hidden">
+                            <input class="form-check-input" type="checkbox" id="show-completed-actions">
+                            <label class="form-check-label" for="show-completed-actions">
+                                Show completed actions
+                            </label>
+                        </div>
+                        <input type="hidden" id="display" name="display">
+                        <button class="btn btn-primary" id="show-tree">Tree</button>
+                        <button class="btn btn-primary" id="show-table">Table</button>
+                        <button class="btn btn-primary">Close</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block extra_body %}
+    <script src="{% static 'js/filters.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+            hideErrors();
+            const calender = flatpickr(".date-selector", {
+                dateFormat: "d/m/Y",
+            });
+            $('#show-tree').click(event => {
+                event.preventDefault();
+                if (validateData()){
+                    $taskFilterForm.attr('action', "{% url 'list-tree' %}");
+                    hideErrors();
+                    $taskFilterForm.submit();
+                }
+            });
+
+            $('#show-table').click(event => {
+                event.preventDefault();
+                if (validateData()){
+                    $taskFilterForm.attr('action', "{% url 'list-table' %}");
+                    hideErrors();
+                    $taskFilterForm.submit();
+                }
+            });
+            $('.input-icon-btn').click(function(event){
+                event.preventDefault();
+                handleIconClick(this);
+            })
+        });
+    </script>
+{% endblock extra_body %}
