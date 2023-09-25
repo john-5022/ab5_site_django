@@ -1,0 +1,131 @@
+{% extends "base.html"%}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5>{{ task.task_name }}</h5>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button class="btn btn-primary" type="submit">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card" style="margin-bottom: 10px">
+                <div class="card-body">
+                    {% if task.actions.all %}
+                        <p>Actions</p>
+                        <div style="text-align: end">
+                            <div style="display: inline-block" class="form-check">
+                                <input class="form-check-input" type="checkbox" data-id="{{ action.id }}" id="show-completed-actions">
+                                <label class="form-check-label" for="show-completed-actions">
+                                    Show Completed Actions
+                                </label>
+                            </div>
+                            <button class="btn btn-primary" id="mark-done-btn" disabled>Mark as Done</button>
+                        </div>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr style="text-align: center">
+                                    <th>
+                                         <div class="form-check">
+                                             <input class="form-check-input" type="checkbox" id="check-all">
+                                         </div>
+                                    </th>
+                                    <th>Action Name</th>
+                                    <th>Action Description</th>
+                                    <th>Action Comment</th>
+                                    <th>Done</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for action in task.actions.all %}
+                                    <tr class="task-table-row" data-isCompleted="{% if action.date_done %}1{% else %}0{% endif %}">
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input action-checkbox" type="checkbox" data-id="{{ action.id }}">
+                                            </div>
+                                        </td>
+                                        <td onclick="window.location='{% url 'edit-action' action.id %}'">{{ action.action_name }}</td>
+                                        <td onclick="window.location='{% url 'edit-action' action.id %}?previous_url={{ request.get_full_path }}'">{{ action.action_description }}</td>
+                                        <td onclick="window.location='{% url 'edit-action' action.id %}?previous_url={{ request.get_full_path }}'">{{ action.action_comment }}</td>
+                                        <td onclick="window.location='{% url 'edit-action' action.id %}?previous_url={{ request.get_full_path }}'">{{ action.date_done }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <h5>No actions found</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card" style="margin-bottom: 10px">
+                <div class="card-body">
+                    <div class="row">
+                        <p class="col-6">Activities</p>
+                        <div class="col-6" style="text-align: end">
+                            <a href="{% url 'add-activity' task.id %}?previous_url={{ request.get_full_path }}" class="btn btn-primary">Add New</a>
+                        </div>
+                    </div>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr style="text-align: center">
+                                <th>Activity Date</th>
+                                <th>Hours</th>
+                                <th>User</th>
+                                <th>Activity Comment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in task.activities.all %}
+                                <tr class="task-table-row">
+                                    <td onclick="window.location='{% url 'edit-activity' activity.id %}?previous_url={{ request.get_full_path }}'">{{ activity.activity_date }}</td>
+                                    <td onclick="window.location='{% url 'edit-activity' activity.id %}?previous_url={{ request.get_full_path }}'">{{ activity.hours }}</td>
+                                    <td onclick="window.location='{% url 'edit-activity' activity.id %}?previous_url={{ request.get_full_path }}'">{{ activity.user.username }}</td>
+                                    <td onclick="window.location='{% url 'edit-activity' activity.id %}?previous_url={{ request.get_full_path }}'">{{ activity.activity_comment }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block extra_body %}
+    <script src="{% static 'js/editTask.js' %}"></script>
+    <script>
+        $markDoneBtn.on('click', () => {
+            $.ajax({
+                type: 'POST',
+                url: '{% url "mark-action-done" %}',
+                data: JSON.stringify({'ids': selectedIds}),
+                contentType: 'application/json',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'), // Include the CSRF token in the request headers
+                },
+                success: function(response) {
+                    location.reload();
+                },
+                error: function(error) {
+                    // Handle errors here
+                    console.error('POST request failed:', error);
+                }
+            });
+        })
+    </script>
+{% endblock extra_body %}

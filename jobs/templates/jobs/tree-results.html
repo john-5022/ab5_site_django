@@ -1,0 +1,82 @@
+{% extends "base.html"%}
+{% load static %}
+
+{% block content %}
+    <style>
+        .icon-link{
+            text-decoration: none;
+            color: black;
+        }
+    </style>
+    {% if clients %}
+        <div class="row">
+            <div class="col-6"></div>
+            <div class="col-6">
+                <h5>Comment</h5>
+            </div>
+        </div>
+        {% for client in clients %}
+            <div class="row" style="margin-bottom: 10px">
+                <span class="col-6">
+                    {% if client.jobs.all|length %}
+                        <i class="bi bi-caret-down toggle-hide-icon"></i>
+                    {% endif %}
+                    {{ client.client_name }}
+                </span>
+                <div class="row hide-able">
+                    {% for job in client.jobs.all %}
+                        <div style="padding-left: 25px" class="row">
+                            <span class="col-6">
+                                {% if job.tasks.all|length %}
+                                    <i class="bi bi-caret-down toggle-hide-icon"></i>
+                                {% endif %}
+                                Pays {{ job.period_end }} - {{ job.job_name }}
+                            </span>
+                            <div class="row hide-able">
+                                {% for task in job.tasks.all %}
+                                    <div style="padding-left: 35px" class="row">
+                                        <span class="col-6">
+                                            {% if task.ordered_actions %}
+                                                <i class="bi bi-caret-down toggle-hide-icon"></i>
+                                            {% endif %}
+                                            {{ task.task_name }}
+                                            <a class="icon-link" href="{% url 'edit-task' task.id %}?previous_url={{ request.path }}">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        </span>
+                                        <span class="col-6">{{ task.task_description }}</span>
+                                        <div class="row hide-able">
+                                            {% for action in task.ordered_actions %}
+                                                <div style="padding-left: 45px" class="row">
+                                                    <span class="col-6">
+                                                        {{ action.action_name }}
+                                                        <a class="icon-link" href="{% url 'edit-action' action.id %}?previous_url={{ request.path }}">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </a>
+                                                    </span>
+                                                    <span class="col-6">{{ action.action_description }}</span>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <h5>No results found</h5>
+    {% endif %}
+    <div class="row">
+        <div class="col">
+            <script>function goBack(){window.location.href='{% url "dashboard" %}?load=true'}</script>
+            <button class="btn btn-primary" onclick="goBack()">Go Back</button>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block extra_body %}
+    <script src="{% static 'js/tree.js' %}"></script>
+{% endblock extra_body %}
